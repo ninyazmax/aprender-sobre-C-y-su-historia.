@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendiendo C++ desde Cero</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-size: 1.15em;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            /* Fondo animado tipo tech */
+            background: linear-gradient(135deg, #181c24 0%, #232946 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Fondo decorativo animado */
+        body::before, body::after {
+            content: "";
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+        }
+        /* Efecto de fondo con gradientes y animación */
+        body::before, body::after {
+            position: absolute;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #00ffe7cc 0%, transparent 70%);
+            filter: blur(60px);
+        }
+        
+        body::before {
+            top: -200px; left: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #00ffe7cc 0%, transparent 70%);
+            filter: blur(60px);
+            animation: move1 12s linear infinite alternate;
+        }
+        body::after {
+            bottom: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #3a86ff99 0%, transparent 70%);
+            filter: blur(60px);
+            animation: move2 14s linear infinite alternate;
+        }
+        @keyframes move1 {
+            0% { transform: translate(0,0);}
+            100% { transform: translate(80px, 120px);}
+        }
+        @keyframes move2 {
+            0% { transform: translate(0,0);}
+            100% { transform: translate(-100px, -80px);}
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210px;
+            height: 100%;
+            background: #232323;
+            border-right: 2px solid #3a86ff44;
+            padding-top: 40px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: 2px 0 16px #00ffe722;
+            transition: left 0.3s;
+        }
+        .sidebar { overflow-y: auto; } /* Permitir scroll en la barra lateral si el contenido es mucho */
+        .sidebar a {
+            display: block;
+            color: #4fc3f7;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 6px 0 0 6px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 1.08em;
+        }
+        .sidebar a {
+            color: #4fc3f7;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 6px 0 0 6px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 1.08em;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #333366;
+            color: #ffb700;
+            box-shadow: 2px 2px 12px #00ffe733;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 40px auto 0 auto;
+            background: rgba(30,34,44,0.98);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+            padding: 40px 60px 20px 60px;
+            margin-left: 230px;
+            position: relative;
+            z-index: 1;
+            transition: margin-left 0.3s;
+        }
+        @media (max-width: 1100px) {
+            .container { max-width: 98vw; padding: 20px 5vw; }
+        }
+        @media (max-width: 900px) {
+            .container { margin-left: 0; padding: 10px 2vw; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 5px 1vw; }
+        }
+        /* Menú superior para móvil */
+        .nav-top {
+            display: none;
+            justify-content: center;
+            gap: 10px;
+            background: #232946;
+            border-radius: 0 0 8px 8px;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .nav-top a {
+            color: #4fc3f7;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 1em;
+        }
+        .nav-top a:hover, .nav-top a.active {
+            background: #232946;
+            color: #ffb700;
+        }
+        h1, h2, h3 {
+            color: #4fc3f7;
+            font-family: 'Montserrat', Arial, sans-serif;
+            letter-spacing: 1px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.6em;
+            margin-bottom: 0.2em;
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text; /* Propiedad estándar */
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-top: 30px;
+            border-bottom: 2px solid #3a86ff;
+            padding-bottom: 10px;
+            animation: fadeIn 1.5s;
+        }
+        h3 {
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: #ffb700;
+            border-bottom: 1px solid #3a86ff44;
+            padding-bottom: 8px;
+        }
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #e0e0e0;
+            animation: fadeIn 1.5s;
+        }
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .nav a {
+            background: #232323;
+            color: #4fc3f7;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav a:hover, .nav a.active {
+            background: #3a86ff;
+            color: #ffb700;
+            box-shadow: 0 2px 8px #00ffe733;
+        }
+        .quote {
+            font-style: italic;
+            color: #ffb700;
+            border-left: 4px solid #00ffe7;
+            padding-left: 18px;
+            margin: 30px 0 30px 0;
+            font-size: 1.1em;
+            animation: fadeIn 2s;
+        }
+        .note {
+            background: linear-gradient(90deg, #232946 60%, #3a86ff22 100%);
+            padding: 18px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 5px solid #00ffe7;
+            color: #e0e0e0;
+            font-size: 1.05em;
+            box-shadow: 0 2px 12px #00ffe722;
+        }
+        code, pre {
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            background: #232323;
+            color: #dcdcaa;
+            border-radius: 6px;
+        }
+        code {
+            padding: 4px 8px;
+            font-size: 0.95em;
+            margin: 0 2px;
+            display: inline-block;
+            transition: background 0.2s, color 0.2s;
+        }
+        code:hover {
+            background: #3a86ff33;
+            color: #00ffe7;
+            box-shadow: 0 0 8px #00ffe733;
+        }
+        pre {
+            padding: 18px;
+            margin: 18px 0;
+            font-size: 1.05em;
+            overflow-x: auto;
+            border-left: 5px solid #3a86ff;
+            transition: box-shadow 0.3s;
+            box-shadow: 0 0 12px #00ffe733;
+        }
+        pre:hover {
+            box-shadow: 0 0 24px #00ffe7cc;
+        }
+        .keyword { color: #3a86ff; }
+        .comment { color: #6a9955; }
+        .string { color: #ffb700; }
+        .number { color: #b5cea8; }
+        table {
+            width: 100%;
+            background: #232946;
+            color: #e0e0e0;
+            border-radius: 8px;
+            margin: 18px 0;
+            border-collapse: collapse;
+            box-shadow: 0 2px 12px #00ffe722;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #3a86ff33;
+        }
+        th {
+            background: #181c24;
+            color: #00ffe7;
+        }
+        tr:last-child td { border-bottom: none; }
+        .exercise {
+            background: #181c24;
+            border: 2px solid #3a86ff;
+            border-radius: 10px;
+            margin: 30px 0;
+            padding: 18px;
+            box-shadow: 0 2px 12px #00ffe733;
+        }
+        .exercise-title {
+            color: #ffb700;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .exercise-desc {
+            margin-bottom: 10px;
+        }
+        .console {
+            background: #11131a;
+            color: #00ffe7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-family: 'Fira Mono', monospace;
+            min-height: 40px;
+            font-size: 1em;
+        }
+        .run-btn {
+            background: linear-gradient(90deg, #4fc3f7 0%, #00ffe7 100%);
+            color: #232323;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 18px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #00ffe733;
+        }
+        .run-btn:hover {
+            background: linear-gradient(90deg, #00ffe7 0%, #4fc3f7 100%);
+            box-shadow: 0 4px 16px #00ffe7aa;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #858585;
+            font-size: 1em;
+            padding-bottom: 20px;
+        }
+
+        /* Estilos para el fondo 3D */
+        #bg-3d {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        #sidebar-toggle {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            color: #232323;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #00ffe733;
+            transition: left 0.3s, background 0.2s, color 0.2s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.85;
+        }
+        #sidebar-toggle.closed {
+            left: 24px;
+            background: #3a86ff;
+            color: #00ffe7;
+            transform: rotate(180deg) scale(0.95);
+        }
+        .sidebar {
+            transition: left 0.4s cubic-bezier(.77,0,.18,1), box-shadow 0.3s;
+        }
+        .sidebar.closed {
+            left: -230px;
+            box-shadow: none;
+        }
+        @media (max-width: 900px) {
+            #sidebar-toggle { top: 14px; left: 14px; }
+        }
+    </style>
+    <style>
+        /* Estilos para el panel lateral de Logros y Créditos */
+        .side-panel {
+            position: fixed;
+            top: 90px;
+            right: -300px; /* Inicia oculto */
+            width: 280px;
+            height: calc(100vh - 120px); /* Altura ajustable */
+            background: #232323;
+            border: 1px solid #3a86ff66;
+            border-radius: 8px 0 0 8px; /* Bordes redondeados a la izquierda */
+            box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .side-panel.open {
+            right: 0; /* Se desliza desde la derecha */
+        }
+        .panel-header {
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            color: #232323;
+            padding: 12px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .panel-content {
+            flex-grow: 1; /* Ocupa el espacio restante */
+            overflow-y: auto; /* Scroll si el contenido es largo */
+            background: #1f2330;
+        }
+        .panel-toggle { /* Botón para abrir/cerrar el panel */
+            position: fixed;
+            top: 24px; /* Alineado con el toggle del sidebar izquierdo */
+            right: 24px;
+            z-index: 1001;
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            color: #232323;
+            border: none;
+            border-radius: 50%; /* Botón redondo */
+            width: 48px;
+            height: 48px;
+            font-size: 1.5em; /* Tamaño del icono/texto */
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #00ffe733;
+            transition: transform 0.3s, background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.85;
+        }
+        .panel-toggle:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .panel-toggle.open { /* Estilo cuando el panel está abierto */
+            background: #3a86ff;
+            color: #00ffe7;
+        }
+
+        .achievement { margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #3a86ff22; }
+        .achievement:last-child { border-bottom: none; margin-bottom: 0; }
+        .achievement h4 { color: #ffb700; margin-top: 0; margin-bottom: 5px; font-size: 1.05em; }
+        .achievement h4 .status { font-size: 0.8em; color: #d4d4d4; }
+        .achievement h4 .status.unlocked { color: #00ffe7; font-weight: bold; }
+        .achievement p { font-size: 0.9em; color: #c0c0c0; margin-bottom: 3px; line-height: 1.4; }
+        .achievement .unlocked-message { color: #b5cea8; font-style: italic; }
+        .achievement .hint i { color: #4fc3f7; }
+
+        /* Estilos para la sección de créditos dentro del panel */
+        #credits-tab p, #credits-tab ul { color: #e0e0e0; font-size: 0.95em; margin-bottom: 8px; padding: 0 15px;}
+        #credits-tab h4 { color: #00ffe7; margin-top: 10px; margin-bottom: 5px; font-size: 1.1em; padding: 0 15px;}
+        #credits-tab ul { list-style-type: disc; padding-left: 35px; margin-top:0; }
+        #credits-tab hr { border-color: #3a86ff44; margin: 12px 0; }
+
+        .tab-buttons {
+            display: flex;
+            background: #181c24; /* Fondo para la barra de pestañas */
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent; /* Indicador de pestaña inactiva */
+            color: #4fc3f7;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-bottom-color 0.2s;
+            font-size: 0.95em;
+        }
+        .tab-btn:hover {
+            background: #232946;
+            color: #00ffe7;
+        }
+        .tab-btn.active {
+            background: #1f2330; /* Fondo de la pestaña activa coincide con panel-content */
+            color: #ffb700;
+            border-bottom: 3px solid #ffb700; /* Indicador de pestaña activa */
+        }
+        .tab-content {
+            display: none; /* Ocultar contenido de pestañas inactivas */
+            padding-top: 15px; /* Espacio entre pestañas y contenido */
+        }
+        .tab-content.active {
+            display: block; /* Mostrar contenido de la pestaña activa */
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align:center; margin-top:30px;">
+        <img src="https://lh3.google.com/u/0/d/1JIn6pQuC09VpbfVaMG17IHuYNBRYMpuM=w1366-h633-iv1?auditContext=prefetch" alt="Logo C++ Pixel" style="width:350px; image-rendering: pixelated; border:8px solid #3a86ff; border-radius:12px; background:#181c24; box-shadow:0 0 24px #00ffe7cc;">
+    </div>
+    <!-- <div id="bg-3d"></div> -->
+    <nav class="sidebar">
+        <a href="#intro">Introducción</a>
+        <a href="#first-program">Primer Programa</a>
+        <a href="#variables">Variables</a>
+        <a href="#operators">Operadores</a>
+        <a href="#decisiones">Decisiones</a>
+        <a href="#ciclos">Ciclos</a>
+        <a href="#funciones">Funciones</a>
+        <a href="#arreglos">Arreglos</a>
+        <a href="#punteros">Punteros</a>
+        <a href="#estructuras">Estructuras</a>
+        <a href="#clases">Clases</a>
+        <a href="#buenaspracticas">Buenas Prácticas</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#ejercicios">Ejercicios</a>
+        <a href="#archivos">Manejo de Archivos</a>
+        <a href="#excepciones">Manejo de Excepciones</a>
+        <a href="#plantillas">Plantillas</a>
+        <a href="#stl">STL</a>
+        <a href="#algoritmos">Algoritmos en STL</a>
+        <a href="#mas-consejos">¿Cómo seguir aprendiendo?</a>
+    </nav>
+    <nav class="nav-top">
+        <a href="#intro">Introducción</a>
+        <a href="#first-program">Primer Programa</a>
+        <a href="#variables">Variables</a>
+        <a href="#operators">Operadores</a>
+        <a href="#decisiones">Decisiones</a>
+        <a href="#ciclos">Ciclos</a>
+        <a href="#funciones">Funciones</a>
+        <a href="#arreglos">Arreglos</a>
+        <a href="#punteros">Punteros</a>
+        <a href="#estructuras">Estructuras</a>
+        <a href="#clases">Clases</a>
+        <a href="#buenaspracticas">Buenas Prácticas</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#ejercicios">Ejercicios</a>
+        <a href="#archivos">Manejo de Archivos</a>
+        <a href="#excepciones">Manejo de Excepciones</a>
+        <a href="#plantillas">Plantillas</a>
+        <a href="#stl">STL</a>
+        <a href="#algoritmos">Algoritmos en STL</a>
+        <a href="#mas-consejos">¿Cómo seguir aprendiendo?</a>
+    </nav>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#first-program">Primer Programa</a>
+            <a href="#variables">Variables</a>
+            <a href="#operators">Operadores</a>
+            <a href="#decisiones">Decisiones</a>
+            <a href="#ciclos">Ciclos</a>
+            <a href="#funciones">Funciones</a>
+            <a href="#ejercicios">Ejercicios</a>
+        </div>
+
+        <h1>Aprendiendo C++ desde Cero</h1>
+        <div class="quote">
+            "El código es poesía lógica que da vida a las ideas." - Steven Gabriel
+        </div>
+
+        <section id="intro">
+            <h2>¿Qué es C++?</h2>
+            <p>C++ es un lenguaje de programación poderoso y versátil, ideal para quienes quieren entender cómo funciona una computadora desde adentro. Aquí aprenderás paso a paso, con ejemplos y ejercicios interactivos, todo lo necesario para comenzar tu viaje como programador.</p>
+            <div class="note">
+                <strong>¿Por qué aprender C++?</strong>
+                <ul>
+                    <li>Es uno de los lenguajes más usados en la industria.</li>
+                    <li>Te da una base sólida para aprender otros lenguajes.</li>
+                    <li>Permite crear desde videojuegos hasta sistemas operativos.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="first-program">
+            <h2>Tu Primer Programa en C++</h2>
+            <p>¡Vamos a escribir tu primer programa! El clásico <strong>Hola Mundo</strong>:</p>
+            <div class="note">
+        <strong>¿Qué hace este código?</strong>
+        <ul>
+            <li>Incluye la biblioteca <code>iostream</code> para mostrar texto en pantalla.</li>
+            <li>Define la función principal <code>main()</code> donde inicia el programa.</li>
+            <li>Usa <code>std::cout</code> para imprimir el mensaje "¡Hola Mundo!" en la consola.</li>
+            <li><code>return 0;</code> indica que el programa terminó correctamente.</li>
+        </ul>
+    </div>
+            <pre><code><span class="comment">// Mi primer programa en C++</span>
+<span class="keyword">#include</span> &lt;iostream&gt;
+
+<span class="keyword">int</span> main() {
+    std::cout &lt;&lt; <span class="string">"¡Hola Mundo!"</span> &lt;&lt; std::endl;
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code></pre>
+        </section>
+
+        <section id="variables">
+            <h2>Variables y Tipos de Datos</h2>
+            <p>Las variables son como cajas donde guardamos información. En C++, cada variable debe tener un tipo.</p>
+            <div class="note">
+        <strong>¿Cómo se usan?</strong>
+        <ul>
+            <li>Primero declaras el tipo de dato (<code>int</code>, <code>float</code>, etc).</li>
+            <li>Luego le das un nombre a la variable y puedes asignarle un valor.</li>
+            <li>Por ejemplo: <code>int edad = 18;</code> crea una variable llamada <code>edad</code> y le asigna el valor 18.</li>
+        </ul>
+    </div>
+            <table>
+                <tr><th>Tipo</th><th>¿Para qué sirve?</th><th>Ejemplo</th></tr>
+                <tr><td><code>int</code></td><td>Números enteros 1, 2 etc</td><td><code>int edad = 18;</code></td></tr>
+                <tr><td><code>float</code></td><td>Números decimales simples 1.1, 1.2, 1.3, etc</td><td><code>float altura = 1.75f;</code></td></tr>
+                <tr><td><code>double</code></td><td>Números decimales más precisos</td><td><code>double pi = 3.1416;</code></td></tr>
+                <tr><td><code>char</code></td><td>Un solo carácter (el cual consiste en basicamente
+                    una sola letra, numero o simbolo)</td><td><code>char letra = 'A';</code></td></tr>
+                <tr><td><code>bool</code></td><td>Verdadero o falso</td><td><code>bool esMayor = true;</code></td></tr>
+                <tr><td><code>string</code></td><td>Texto (requiere <code>#include &lt;string&gt;</code>)</td><td><code>std::string nombre = "Ana";</code></td></tr>
+            </table>
+            <div class="note">
+                <strong>Consejo:</strong> Usa nombres de variables claros y descriptivos, ¡te ahorrarás dolores de cabeza! (aunque también puedes optar por usar
+                nombres cortos si estás haciendo un programa pequeño o de prueba)
+            </div>
+        </section>
+
+        <section id="operators">
+            <h2>Operadores en C++</h2>
+            <p>Los operadores permiten hacer operaciones matemáticas y lógicas.</p>
+            <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>Declara dos variables enteras <code>a</code> y <code>b</code> con valores 10 y 3.</li>
+            <li>Realiza operaciones básicas: suma, resta, multiplicación, división y módulo.</li>
+            <li>Cada resultado se guarda en una variable diferente.</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">int</span> a = 10, b = 3;
+<span class="keyword">int</span> suma = a + b;    <span class="comment">// Suma (13)</span>
+<span class="keyword">int</span> resta = a - b;   <span class="comment">// Resta (7)</span>
+<span class="keyword">int</span> producto = a * b; <span class="comment">// Multiplicación (30)</span>
+<span class="keyword">int</span> division = a / b; <span class="comment">// División entera (3)</span>
+<span class="keyword">int</span> modulo = a % b;  <span class="comment">// Módulo (resto de la división, 1)</span></code></pre>
+            <div class="note">
+                <strong>Tip:</strong> Usa paréntesis para asegurarte del orden de las operaciones.
+            </div>
+        </section>
+
+        <section id="decisiones">
+            <h2>Toma de Decisiones</h2>
+            <p>Los programas pueden tomar decisiones usando condiciones (condicionales). En C++ usamos <code>if</code>, <code>else if</code> y <code>else</code>.</p>
+            <div class="note">
+        <strong>¿Qué hace este código?</strong>
+        <ul>
+            <li>Pide al usuario que ingrese su edad usando <code>std::cin</code>.</li>
+            <li>Si la edad es mayor o igual a 18, muestra "Eres mayor de edad".</li>
+            <li>Si no, muestra "Eres menor de edad".</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">int</span> edad;
+std::cin >> edad;
+<span class="keyword">if</span> (edad >= 18) {
+    std::cout &lt;&lt; <span class="string">"Eres mayor de edad"</span>;
+} <span class="keyword">else</span> {
+    std::cout &lt;&lt; <span class="string">"Eres menor de edad"</span>;
+}</code></pre>
+            <div class="note">
+                <strong>Consejo:</strong> Prueba siempre los casos límite, por ejemplo, 17, 18 y 19.
+            </div>
+        </section>
+
+        <section id="ciclos">
+            <h2>Ciclos: Repetir sin cansarse</h2>
+            <p>Los ciclos permiten repetir instrucciones varias veces. Los más usados son <code>for</code> y <code>while</code>.</p>
+            <div class="note">
+        <strong>¿Qué hace el ciclo <code>for</code>?</strong>
+        <ul>
+            <li>Declara una variable <code>i</code> que empieza en 0.</li>
+            <li>Mientras <code>i</code> sea menor que 5, ejecuta el bloque de código.</li>
+            <li>En cada vuelta, muestra el valor de <code>i</code> y lo incrementa en 1.</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">for</span> (<span class="keyword">int</span> i = 0; i &lt; 5; i++) {
+    std::cout &lt;&lt; i &lt;&lt; std::endl;
+}</code></pre>
+            <div class="note">
+        <strong>¿Y el ciclo <code>while</code>?</strong>
+        <ul>
+            <li>Declara una variable <code>contador</code> en 0.</li>
+            <li>Mientras <code>contador</code> sea menor que 3, muestra su valor y lo incrementa.</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">int</span> contador = 0;
+<span class="keyword">while</span> (contador &lt; 3) {
+    std::cout &lt;&lt; contador &lt;&lt; std::endl;
+    contador++;
+}</code></pre>
+        </section>
+
+        <section id="funciones">
+            <h2>Funciones: Reutiliza tu código</h2>
+            <p>Una función es un bloque de código que realiza una tarea específica. Ayuda a organizar y reutilizar el código.</p>
+            <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>La función <code>sumar</code> recibe dos enteros y devuelve su suma.</li>
+            <li>La función <code>factorial</code> es recursiva: se llama a sí misma para calcular el factorial de un número.</li>
+            <li>En <code>main()</code> se muestran ejemplos de uso de ambas funciones.</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">int</span> sumar(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+    <span class="keyword">return</span> a + b;
+}
+
+<span class="comment">// Función recursiva para calcular el factorial de un número</span>
+<span class="keyword">int</span> factorial(<span class="keyword">int</span> n) {
+    <span class="keyword">if</span> (n &lt;= 1) <span class="keyword">return</span> 1;
+    <span class="keyword">else</span> <span class="keyword">return</span> n * factorial(n - 1);
+}
+
+<span class="keyword">int</span> main() {
+    std::cout &lt;&lt; sumar(3, 4) &lt;&lt; std::endl; <span class="comment">// Imprime 7</span>
+    std::cout &lt;&lt; factorial(5) &lt;&lt; std::endl; <span class="comment">// Imprime 120</span>
+    <span class="keyword">return</span> 0;
+}</code></pre>
+            <div class="note">
+                <strong>¿Qué es recursividad?</strong>
+                <ul>
+                    <li>Una función recursiva se llama a sí misma para resolver problemas que pueden dividirse en subproblemas más pequeños.</li>
+                    <li>En este ejemplo, <code>factorial(5)</code> calcula 5 × 4 × 3 × 2 × 1.</li>
+                    <li>¡Cuidado! Toda función recursiva debe tener una condición de parada para evitar bucles infinitos.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="arreglos">
+            <h2>Arreglos en C++</h2>
+            <p>Un arreglo es una colección de variables del mismo tipo. Imagina una fila de casilleros donde cada uno guarda un valor.</p>
+            <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>Declara un arreglo de 5 enteros llamado <code>numeros</code> y le asigna los valores 1, 2, 3, 4 y 5.</li>
+            <li><code>numeros[0]</code> accede al primer elemento del arreglo (el número 1).</li>
+            <li>Recuerda: los arreglos empiezan en el índice 0.</li>
+        </ul>
+    </div>
+            <pre><code><span class="keyword">int</span> numeros[5] = {1, 2, 3, 4, 5};
+std::cout &lt;&lt; numeros[0]; <span class="comment">// Imprime 1</span></code></pre>
+            <div class="note">
+                <strong>Recuerda:</strong> El primer elemento es el índice 0.
+            </div>
+        </section>
+
+        <section id="punteros">
+            <h2>Punteros: ¿Qué son y para qué sirven?</h2>
+            <p>
+        Un <strong>puntero</strong> es una variable especial que almacena la <strong>dirección de memoria</strong> de otra variable. Es decir, en vez de guardar un valor directamente, guarda la ubicación donde está ese valor en la memoria del computador.<br>
+        Los punteros son fundamentales en C++ para manipular datos de forma eficiente, crear estructuras dinámicas (como listas enlazadas) y para pasar grandes cantidades de datos a funciones sin copiarlos.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li><code>int x = 10;</code> crea una variable entera llamada <code>x</code> y le asigna el valor 10.</li>
+            <li><code>int* p = &x;</code> declara un puntero a entero llamado <code>p</code> y lo inicializa con la dirección de memoria de <code>x</code> (el operador <code>&</code> obtiene la dirección de una variable).</li>
+            <li><code>std::cout &lt;&lt; p;</code> imprime la dirección de memoria almacenada en <code>p</code> (por ejemplo, <code>0x7ffee4b8c8ac</code>).</li>
+            <li><code>*p</code> es el operador de <strong>desreferenciación</strong>: accede al valor almacenado en la dirección a la que apunta <code>p</code>. Así, <code>*p</code> es igual a <code>x</code> (10).</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">int</span> x = 10;
+<span class="keyword">int</span>* p = &x; <span class="comment">// p guarda la dirección de x</span>
+std::cout &lt;&lt; "Dirección de x: " &lt;&lt; p &lt;&lt; std::endl; <span class="comment">// Muestra la dirección de x</span>
+std::cout &lt;&lt; "Valor de x usando *p: " &lt;&lt; *p &lt;&lt; std::endl; <span class="comment">// Muestra 10</span>
+*p = 20; <span class="comment">// Cambia el valor de x a través del puntero</span>
+std::cout &lt;&lt; "Nuevo valor de x: " &lt;&lt; x &lt;&lt; std::endl; <span class="comment">// Muestra 20</span>
+</code></pre>
+    <div class="note">
+        <strong>¿Por qué aprender punteros?</strong>
+        <ul>
+            <li>Permiten modificar variables fuera de la función donde se declaran (paso por referencia).</li>
+            <li>Son esenciales para trabajar con arreglos dinámicos y estructuras de datos complejas.</li>
+            <li>Ayudan a optimizar el uso de memoria y recursos.</li>
+        </ul>
+        <strong>¡Cuidado!</strong> Usar punteros incorrectamente puede causar errores difíciles de detectar, como acceder a memoria no válida (punteros "colgantes").
+    </div>
+</section>
+
+<section id="estructuras">
+    <h2>Estructuras: Agrupa tus datos</h2>
+    <p>
+        Una <strong>estructura</strong> (<code>struct</code>) te permite agrupar diferentes tipos de datos bajo un solo nombre. Es como crear tu propio tipo de dato personalizado, donde cada campo puede ser de un tipo distinto.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>Se define una estructura llamada <code>Persona</code> con dos campos: <code>edad</code> (entero) y <code>nombre</code> (cadena de texto).</li>
+            <li>Se crea una variable <code>alumno</code> de tipo <code>Persona</code>.</li>
+            <li>Se asignan valores a los campos de <code>alumno</code> usando el operador punto (<code>.</code>).</li>
+            <li>Se accede a los datos de la estructura igual que a los de una variable normal, usando el punto.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">struct</span> Persona {
+    <span class="keyword">int</span> edad;
+    std::string nombre;
+};
+
+Persona alumno; <span class="comment">// Declara una variable de tipo Persona</span>
+alumno.edad = 18; <span class="comment">// Asigna 18 a la edad</span>
+alumno.nombre = "Ana"; <span class="comment">// Asigna "Ana" al nombre</span>
+std::cout &lt;&lt; "Nombre: " &lt;&lt; alumno.nombre &lt;&lt; ", Edad: " &lt;&lt; alumno.edad &lt;&lt; std::endl;
+</code></pre>
+    <div class="note">
+        <strong>¿Para qué sirven?</strong>
+        <ul>
+            <li>Organizar datos relacionados (por ejemplo, los datos de un estudiante, producto, libro, etc.).</li>
+            <li>Facilitar el manejo de colecciones de objetos complejos (arreglos de estructuras).</li>
+        </ul>
+        <strong>Tip:</strong> Puedes crear arreglos de estructuras, por ejemplo: <code>Persona grupo[30];</code>
+    </div>
+</section>
+
+<section id="clases">
+    <h2>Clases y Programación Orientada a Objetos</h2>
+    <p>
+        Una <strong>clase</strong> es una extensión de las estructuras: además de agrupar datos, también puede tener funciones (métodos) que operan sobre esos datos. Es la base de la <strong>Programación Orientada a Objetos (POO)</strong> en C++.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>Se define una clase <code>Animal</code> con un atributo público <code>nombre</code> y un método público <code>hablar()</code>.</li>
+            <li>El método <code>hablar()</code> imprime un mensaje usando el nombre del animal.</li>
+            <li>Se crea un objeto <code>perro</code> de tipo <code>Animal</code>, se le asigna un nombre y se llama a su método <code>hablar()</code>.</li>
+            <li>El acceso <code>public:</code> permite que los atributos y métodos sean accesibles desde fuera de la clase.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">class</span> Animal {
+<span class="keyword">public</span>:
+    std::string nombre;
+    <span class="keyword">void</span> hablar() {
+        std::cout &lt;&lt; "Hola, soy " &lt;&lt; nombre &lt;&lt; std::endl;
+    }
+};
+
+Animal perro; <span class="comment">// Crea un objeto de tipo Animal</span>
+perro.nombre = "Firulais";
+perro.hablar(); <span class="comment">// Llama al método hablar()</span>
+</code></pre>
+    <div class="note">
+        <strong>¿Por qué usar clases?</strong>
+        <ul>
+            <li>Permiten modelar objetos del mundo real con datos (atributos) y comportamientos (métodos).</li>
+            <li>Facilitan la reutilización y organización del código.</li>
+            <li>Permiten usar conceptos avanzados como herencia y polimorfismo.</li>
+        </ul>
+        <strong>Tip:</strong> Puedes crear múltiples objetos de la misma clase, cada uno con sus propios datos.
+    </div>
+</section>
+
+<section id="archivos">
+    <h2>Manejo de Archivos en C++</h2>
+    <p>
+        Leer y escribir archivos permite que tu programa guarde información de manera permanente o procese datos externos. En C++ se usan las bibliotecas <code>&lt;fstream&gt;</code> para esto.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li><code>#include &lt;fstream&gt;</code> incluye las clases para manejo de archivos.</li>
+            <li><code>std::ofstream archivo("datos.txt");</code> crea (o abre) un archivo para escritura.</li>
+            <li><code>archivo &lt;&lt; "Hola archivo!";</code> escribe texto en el archivo.</li>
+            <li><code>archivo.close();</code> cierra el archivo, asegurando que los datos se guarden correctamente.</li>
+            <li>Para leer, se usa <code>std::ifstream</code> y el método <code>getline</code> para leer línea por línea.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">#include</span> &lt;fstream&gt;
+<span class="keyword">#include</span> &lt;iostream&gt;
+<span class="keyword">#include</span> &lt;string&gt;
+
+<span class="keyword">int</span> main() {
+    std::ofstream archivo("datos.txt"); <span class="comment">// Abre archivo para escribir</span>
+    archivo &lt;&lt; "Hola archivo!" &lt;&lt; std::endl;
+    archivo.close();
+
+    std::ifstream entrada("datos.txt"); <span class="comment">// Abre archivo para leer</span>
+    std::string linea;
+    <span class="keyword">if</span> (entrada.is_open()) {
+        <span class="keyword">while</span> (getline(entrada, linea)) {
+            std::cout &lt;&lt; "Leído: " &lt;&lt; linea &lt;&lt; std::endl;
+        }
+        entrada.close();
+    } <span class="keyword">else</span> {
+        std::cout &lt;&lt; "No se pudo abrir el archivo." &lt;&lt; std::endl;
+    }
+    <span class="keyword">return</span> 0;
+}
+</code></pre>
+    <div class="note">
+        <strong>¿Qué debes recordar?</strong>
+        <ul>
+            <li>Siempre cierra los archivos después de usarlos.</li>
+            <li>Verifica si el archivo se abrió correctamente antes de leer o escribir.</li>
+            <li>Los archivos se guardan en la misma carpeta que tu programa, a menos que indiques otra ruta.</li>
+        </ul>
+    </div>
+</section>
+
+<section id="excepciones">
+    <h2>Manejo de Excepciones</h2>
+    <p>
+        Las <strong>excepciones</strong> permiten manejar errores de forma controlada. Si ocurre un problema (por ejemplo, división por cero o archivo no encontrado), puedes "lanzar" una excepción y "atraparla" para evitar que el programa se cierre inesperadamente.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li>El bloque <code>try</code> contiene el código que podría causar un error.</li>
+            <li>Si ocurre un problema, <code>throw</code> lanza una excepción (en este caso, un mensaje de texto).</li>
+            <li>El bloque <code>catch</code> recibe la excepción y ejecuta el código para manejar el error (por ejemplo, mostrar un mensaje).</li>
+            <li>El programa continúa después del manejo de la excepción.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">try</span> {
+    <span class="keyword">int</span> a = 10, b = 0;
+    <span class="keyword">if</span> (b == 0)
+        <span class="keyword">throw</span> <span class="string">"Error: división por cero"</span>;
+    std::cout &lt;&lt; (a / b) &lt;&lt; std::endl;
+} <span class="keyword">catch</span> (const char* msg) {
+    std::cout &lt;&lt; "Excepción capturada: " &lt;&lt; msg &lt;&lt; std::endl;
+}
+std::cout &lt;&lt; "El programa sigue funcionando." &lt;&lt; std::endl;
+</code></pre>
+    <div class="note">
+        <strong>¿Cuándo usar excepciones?</strong>
+        <ul>
+            <li>Cuando hay operaciones que pueden fallar (archivos, divisiones, memoria dinámica, etc.).</li>
+            <li>Para mostrar mensajes claros al usuario y evitar que el programa termine abruptamente.</li>
+        </ul>
+        <strong>Tip:</strong> Puedes lanzar y capturar diferentes tipos de excepciones (int, string, objetos, etc.).
+    </div>
+</section>
+
+<section id="plantillas">
+    <h2>Plantillas (Templates)</h2>
+    <p>
+        Las <strong>plantillas</strong> permiten escribir funciones o clases que funcionan con cualquier tipo de dato, sin duplicar código. Son la base de la programación genérica en C++.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li><code>template &lt;typename T&gt;</code> indica que la función <code>sumar</code> puede recibir cualquier tipo de dato (<code>T</code>).</li>
+            <li>Cuando llamas a <code>sumar(3, 4)</code>, <code>T</code> es <code>int</code>. Si llamas a <code>sumar(2.5, 1.2)</code>, <code>T</code> es <code>double</code>.</li>
+            <li>El compilador genera automáticamente la versión adecuada de la función según los tipos de datos usados.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;
+T sumar(T a, T b) {
+    return a + b;
+}
+
+std::cout &lt;&lt; sumar(3, 4) &lt;&lt; std::endl; <span class="comment">// Suma enteros: 7</span>
+std::cout &lt;&lt; sumar(2.5, 1.2) &lt;&lt; std::endl; <span class="comment">// Suma doubles: 3.7</span>
+</code></pre>
+    <div class="note">
+        <strong>¿Por qué usar plantillas?</strong>
+        <ul>
+            <li>Evitas repetir el mismo código para diferentes tipos de datos.</li>
+            <li>Son la base de las estructuras y algoritmos genéricos de la STL.</li>
+        </ul>
+    </div>
+</section>
+
+<section id="stl">
+    <h2>STL: La Biblioteca Estándar de Plantillas</h2>
+    <p>
+        La <strong>STL (Standard Template Library)</strong> es una colección de clases y algoritmos genéricos listos para usar, como <code>vector</code>, <code>list</code>, <code>map</code>, <code>set</code>, y muchos más. Facilita el trabajo con estructuras de datos y algoritmos eficientes.
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li><code>#include &lt;vector&gt;</code> permite usar la clase <code>std::vector</code>, un arreglo dinámico que puede crecer o reducirse en tiempo de ejecución.</li>
+            <li><code>std::vector&lt;int&gt; numeros = {1, 2, 3};</code> crea un vector de enteros con tres elementos.</li>
+            <li><code>numeros.push_back(4);</code> agrega el número 4 al final del vector.</li>
+            <li>Puedes acceder a los elementos igual que en un arreglo: <code>numeros[0]</code> es 1.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">#include</span> &lt;vector&gt;
+std::vector&lt;<span class="keyword">int</span>&gt; numeros = {1, 2, 3}; <span class="comment">// Vector con 3 elementos</span>
+numeros.push_back(4); <span class="comment">// Ahora tiene 4 elementos: 1, 2, 3, 4</span>
+std::cout &lt;&lt; "Primer elemento: " &lt;&lt; numeros[0] &lt;&lt; std::endl;
+</code></pre>
+    <div class="note">
+        <strong>¿Por qué usar STL?</strong>
+        <ul>
+            <li>Te ahorra tiempo: no necesitas programar tus propias estructuras de datos.</li>
+            <li>Son rápidas, seguras y probadas.</li>
+            <li>Incluyen algoritmos útiles como ordenación, búsqueda, conteo, etc.</li>
+        </ul>
+    </div>
+</section>
+
+<section id="algoritmos">
+    <h2>Algoritmos en STL</h2>
+    <p>
+        La STL incluye algoritmos listos para usar, como <code>sort</code> (ordenar), <code>find</code> (buscar), <code>count</code> (contar), entre otros. Funcionan con los contenedores de la STL (como <code>vector</code>).
+    </p>
+    <div class="note">
+        <strong>¿Cómo funciona el ejemplo?</strong>
+        <ul>
+            <li><code>#include &lt;algorithm&gt;</code> permite usar algoritmos estándar.</li>
+            <li><code>std::sort(v.begin(), v.end());</code> ordena el vector <code>v</code> de menor a mayor.</li>
+            <li><code>v.begin()</code> y <code>v.end()</code> son iteradores que indican el inicio y el final del vector.</li>
+            <li>Después de ordenar, puedes recorrer el vector para ver los elementos ya ordenados.</li>
+        </ul>
+    </div>
+    <pre><code><span class="keyword">#include</span> &lt;vector&gt;
+<span class="keyword">#include</span> &lt;algorithm&gt;
+<span class="keyword">#include</span> &lt;iostream&gt;
+
+std::vector&lt;<span class="keyword">int</span>&gt; v = {3, 1, 4};
+std::sort(v.begin(), v.end()); <span class="comment">// Ordena: 1, 3, 4</span>
+for(<span class="keyword">int</span> n : v) {
+    std::cout &lt;&lt; n &lt;&lt; " ";
+}
+std::cout &lt;&lt; std::endl;
+</code></pre>
+    <div class="note">
+        <strong>Tip:</strong> Consulta la <a href="https://en.cppreference.com/w/cpp/algorithm" target="_blank">documentación de algoritmos STL</a> para descubrir todo lo que puedes hacer.
+    </div>
+</section>
+
+<section id="mas-consejos">
+    <h2>¿Cómo seguir aprendiendo?</h2>
+    <ul>
+        <li>Haz proyectos propios: una calculadora, un juego, un gestor de tareas.</li>
+        <li>Lee código abierto en GitHub.</li>
+        <li>Participa en comunidades y foros.</li>
+        <li>Resuelve problemas en sitios como <a href="https://www-w3schools-com.translate.goog/cpp/cpp_exercises.asp?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=tc" target="_blank">w3schools</a> o <a href="https://www.codechef.com/practice/cpp" target="_blank">codechef</a>.</li>
+        <li>Aprende sobre depuración y uso de herramientas como <code>gdb</code>.</li>
+        <li>¡Nunca dejes de experimentar!</li>
+    </ul>
+    <div class="note">
+        <strong>Recuerda:</strong> La mejor forma de aprender es programando y resolviendo problemas reales.
+    </div>
+</section>
+    </div> 
+
+    <button class="panel-toggle" id="panel-toggle" aria-label="Abrir panel de logros y créditos">🏆</button>
+
+    <!-- Panel lateral para Logros y Créditos -->
+    <div class="side-panel" id="side-panel">
+        <div class="panel-header">
+            <span>Extras</span>
+            <button id="close-panel" style="background:none; border:none; color:#232323; font-size:1.5em; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="achievements">Logros</button>
+            <button class="tab-btn" data-tab="credits">Créditos</button>
+        </div>
+        <div class="panel-content">
+            <div class="tab-content active" id="achievements-tab">
+                <!-- Los logros se poblarán con JavaScript aquí steven... Dioooos. -->
+            </div>
+            <div class="tab-content" id="credits-tab">
+                <p style="text-align: center; font-size: 1.1em; color: #00ffe7;"><em>"Del bit al cohete, la imaginación no tiene límite."</em></p>
+                <hr>
+                <h4>Creadores:</h4>
+                <ul>
+                    <li>Steven Gabriel</li>
+                    <li>Sofia Abigail</li>
+                </ul>
+                <p style="text-align:center; font-size:0.9em;"><em>&copy; 2024</em></p>
+                <hr>
+                <h4>Inspiraciones:</h4>
+                <ul>
+                    <li>los 2: la manera de pensar luego de tener algo valioso como esto.</li>
+                    <li>Sofi:El deseo de simplificar lo complejo y compartir conocimiento :D.</li>
+                    <li>Steve: Las comunidades de desarrollo y una buena taza de café (capas que
+                        asta una monster jsjsj).</li>
+                    <li>decoracion echa por Steven.</li>
+                    <li>la informacion dada por Steven y Sofia.</li>
+                    <li>Los scripts fueron echos por Sofia.</li> //yo jsjsjsjs
+                    <li>y por supuesto, a ti, que estás leyendo esto y aprendiendo.</li>
+                    <li>posdata: la pagina es de codigo abierto.</li>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <button id="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+
+    <!-- SCRIPTS (echos por sofi) -->
+    <script>
+        function checkNav() {
+            if(window.innerWidth < 900) {
+                document.querySelector('.nav-top').style.display = 'flex';
+            } else {
+                document.querySelector('.nav-top').style.display = 'none';
+            }
+        }
+        window.addEventListener('resize', checkNav);
+        window.addEventListener('DOMContentLoaded', checkNav);
+        function highlightMenu() {
+            let sections = document.querySelectorAll('section[id]');
+            let scrollPos = window.scrollY + 120;
+            sections.forEach(sec => {
+                let link = document.querySelectorAll('a[href="#'+sec.id+'"]');
+                if(sec.offsetTop <= scrollPos && sec.offsetTop + sec.offsetHeight > scrollPos) {
+                    link.forEach(l => l.classList.add('active'));
+                } else {
+                    link.forEach(l => l.classList.remove('active'));
+                }
+            });
+        }
+        window.addEventListener('scroll', highlightMenu);
+        window.addEventListener('DOMContentLoaded', highlightMenu);
+    </script>
+
+    <script>
+const sidebar = document.querySelector('.sidebar');
+const toggleBtn = document.getElementById('sidebar-toggle');
+let sidebarOpen = true;
+function updateSidebar() {
+    if (sidebarOpen) {
+        sidebar.classList.remove('closed');
+        toggleBtn.classList.remove('closed');
+        toggleBtn.innerHTML = '&times;';
+        toggleBtn.setAttribute('aria-label', 'Cerrar menú');
+    } else {
+        sidebar.classList.add('closed');
+        toggleBtn.classList.add('closed');
+        toggleBtn.innerHTML = '&#9776;';
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
+    }
+}
+toggleBtn.onclick = function() {
+    sidebarOpen = !sidebarOpen;
+    updateSidebar();
+};
+// Steven... DIOOOS, que no se te olvide el resize.
+window.addEventListener('resize', ()=>{
+    if(window.innerWidth < 900) {
+        sidebarOpen = false;
+        updateSidebar();
+    } else {
+        sidebarOpen = true;
+        updateSidebar();
+    }
+});
+window.addEventListener('DOMContentLoaded', updateSidebar);
+
+        // Steven... estas líneas son para el panel de logros y créditos DIOOOS.
+        const panel = document.getElementById('side-panel');
+        const panelToggle = document.getElementById('panel-toggle');
+        const closePanelBtn = document.getElementById('close-panel');
+        let panelOpen = false;
+
+        function updateRightPanel() {
+            if (panelOpen) {
+                panel.classList.add('open');
+                panelToggle.classList.add('open');
+                panelToggle.innerHTML = '&times;'; // Icono de cerrar
+                panelToggle.setAttribute('aria-label', 'Cerrar panel de logros y créditos');
+            } else {
+                panel.classList.remove('open');
+                panelToggle.classList.remove('open');
+                panelToggle.innerHTML = '🏆'; // Icono de trofeo
+                panelToggle.setAttribute('aria-label', 'Abrir panel de logros y créditos');
+            }
+        }
+
+        panelToggle.addEventListener('click', () => {
+            panelOpen = !panelOpen;
+            updateRightPanel();
+        });
+
+        closePanelBtn.addEventListener('click', () => {
+            panelOpen = false;
+            updateRightPanel();
+        });
+
+        // Cerrar el panel si se hace clic fuera de él
+        window.addEventListener('click', function(event) {
+            if (panelOpen && panel && !panel.contains(event.target) && !panelToggle.contains(event.target)) {
+                panelOpen = false;
+                updateRightPanel();
+            }
+        });
+
+
+        // Tabs del panel
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remover active de todos los botones y contenidos
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Añadir active al botón clickeado y su contenido correspondiente
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+
+
+        // --- SISTEMA DE LOGROS ---
+        const achievements = {
+            "easter-egg-42": { unlocked: false, name: "El Sentido de la Vida", hint: "Un número muy conocido en la ciencia ficción humorística.", unlockedMessage: "¡Has encontrado la respuesta a la pregunta fundamental!" },
+            "easter-egg-error-pantalla": { unlocked: false, name: "Error de Capa 8", hint: "A veces, el problema no está en el código, sino...", unlockedMessage: "¡Exacto! El error estaba frente a la pantalla." },
+            "easter-egg-fiesta": { unlocked: false, name: "Alma de la Fiesta", hint: "Hay un botón secreto que cambia el ambiente. ¿Qué pasa si lo presionas repetidamente?", unlockedMessage: "¡La fiesta no para contigo!" },
+            "easter-egg-sidebar-explorer": { unlocked: false, name: "Explorador de Interfaces", hint: "El menú lateral es más interactivo de lo que parece. Intenta abrirlo y cerrarlo varias veces.", unlockedMessage: "¡Has navegado por todos los rincones!" }
+        };
+
+        function unlockAchievement(id) {
+            if (achievements[id] && !achievements[id].unlocked) {
+                achievements[id].unlocked = true;
+                // Primero actualiza el DOM y guarda el estado
+                updateAchievementsListDOM();
+                saveAchievementsState();
+                // Luego notifica al usuario
+                alert(`¡Logro desbloqueado: ${achievements[id].name}!`);
+            }
+        }
+
+        function updateAchievementsListDOM() {
+            const achievementsTab = document.getElementById('achievements-tab');
+            if (!achievementsTab) return;
+            achievementsTab.innerHTML = ''; 
+
+            const sortedAchievementIds = Object.keys(achievements).sort((a, b) => {
+                if (achievements[a].unlocked && !achievements[b].unlocked) return -1;
+                if (!achievements[a].unlocked && achievements[b].unlocked) return 1;
+                return (achievements[a].name || "").localeCompare(achievements[b].name || "");
+            });
+
+            for (const id of sortedAchievementIds) {
+                const ach = achievements[id];
+                const achDiv = document.createElement('div');
+                achDiv.classList.add('achievement');
+                achDiv.dataset.id = id;
+
+                const title = document.createElement('h4');
+                title.innerHTML = `${ach.name} <span class="status ${ach.unlocked ? 'unlocked' : ''}">(${ach.unlocked ? 'Desbloqueado' : 'Bloqueado'})</span>`;
+
+                const hintP = document.createElement('p');
+                hintP.classList.add('hint');
+                hintP.innerHTML = `<i>Pista:</i> ${ach.hint}`;
+
+                const unlockedMsgP = document.createElement('p');
+                unlockedMsgP.classList.add('unlocked-message');
+                unlockedMsgP.textContent = ach.unlockedMessage;
+                
+                achDiv.appendChild(title);
+                if (ach.unlocked) {
+                    achDiv.appendChild(unlockedMsgP);
+                } else {
+                    achDiv.appendChild(hintP);
+                }
+                achievementsTab.appendChild(achDiv);
+            }
+        }
+
+        function loadAchievementsState() {
+            const savedAchievements = localStorage.getItem('unlockedCppPageAchievements');
+            if (savedAchievements) {
+                const unlockedIds = JSON.parse(savedAchievements);
+                unlockedIds.forEach(id => {
+                    if (achievements[id]) {
+                        achievements[id].unlocked = true;
+                    }
+                });
+            }
+            updateAchievementsListDOM();
+        }
+
+        function saveAchievementsState() {
+            const unlockedIds = Object.keys(achievements).filter(id => achievements[id].unlocked);
+            localStorage.setItem('unlockedCppPageAchievements', JSON.stringify(unlockedIds));
+        }
+
+        // Modificar la función checkEasterEgg existente para integrar los logros
+        const originalCheckEasterEgg = window.checkEasterEgg;
+        window.checkEasterEgg = function(exerciseNum) {
+            if (typeof originalCheckEasterEgg === 'function') {
+                originalCheckEasterEgg(exerciseNum); // Ejecuta la lógica original del easter egg (mostrar mensaje en consola)
+            }
+
+            let codeInput = document.getElementById('code' + exerciseNum);
+            if (!codeInput) return;
+            let code = codeInput.value;
+            let consoleDiv = document.getElementById('console' + exerciseNum);
+
+            if (code.includes("42")) {
+                unlockAchievement("easter-egg-42");
+            }
+
+            if (code.toLowerCase().includes("el error esta frente a la pantalla")) {
+                if (consoleDiv && !consoleDiv.innerHTML.includes("A veces el problema somos nosotros")) { // Evitar duplicar mensaje
+                     consoleDiv.innerHTML += "<br>🕵️ <b>¡Correcto! A veces el problema no es el hardware ni el software...</b>";
+                }
+                unlockAchievement("easter-egg-error-pantalla");
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAchievementsState();
+
+            const achievementsToggle = document.getElementById('achievements-toggle');
+            const achievementsList = document.getElementById('achievements-list');
+            const creditsToggle = document.getElementById('credits-toggle');
+            const creditsList = document.getElementById('credits-list');
+
+            function toggleDropdown(btn, list, otherBtn, otherList) {
+                const isShown = list.classList.toggle('show');
+                btn.innerHTML = isShown ? `${btn.textContent.split(' ')[0]} ${btn.textContent.split(' ')[1]} ▲` : `${btn.textContent.split(' ')[0]} ${btn.textContent.split(' ')[1]} ▼`;
+                if (isShown && otherList) {
+                    otherList.classList.remove('show');
+                    if (otherBtn) otherBtn.innerHTML = `${otherBtn.textContent.split(' ')[0]} ${otherBtn.textContent.split(' ')[1]} ▼`;
+                }
+            }
+
+            if (achievementsToggle && achievementsList) {
+                achievementsToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(achievementsToggle, achievementsList, creditsToggle, creditsList);
+                });
+            }
+
+            if (creditsToggle && creditsList) {
+                creditsToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(creditsToggle, creditsList, achievementsToggle, achievementsList);
+                });
+            }
+
+            window.addEventListener('click', function(event) {
+                [achievementsList, creditsList].forEach((list, index) => {
+                    const btn = index === 0 ? achievementsToggle : creditsToggle;
+                    if (list && list.classList.contains('show') && btn && !btn.contains(event.target) && !list.contains(event.target)) {
+                        list.classList.remove('show');
+                        btn.innerHTML = `${btn.textContent.split(' ')[0]} ${btn.textContent.split(' ')[1]} ▼`;
+                    }
+                });
+            });
+
+            // Easter egg para el botón de fiesta (ya existe en el script anterior, solo añadimos el logro)
+            const secretFiestaBtn = Array.from(document.querySelectorAll('button')).find(btn => btn.textContent.includes("¿Modo fiesta?"));
+            if (secretFiestaBtn) {
+                let fiestaClickCount = 0; // Contador local para este logro
+                secretFiestaBtn.addEventListener('click', () => {
+                    fiestaClickCount++;
+                    if (fiestaClickCount === 7) {
+                        unlockAchievement("easter-egg-fiesta");
+                    }
+                });
+            }
+
+            // Easter egg para el toggle de la barra lateral (ya existe en el script anterior, solo añadimos el logro)
+            const sidebarToggleButton = document.getElementById('sidebar-toggle');
+            if (sidebarToggleButton) {
+                let sidebarOurCount = 0; // Contador local para este logro
+                sidebarToggleButton.addEventListener('click', () => {
+                    sidebarOurCount++;
+                    if (sidebarOurCount === 10) { // El alert original es a los 7, el logro a los 10
+                        unlockAchievement("easter-egg-sidebar-explorer");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

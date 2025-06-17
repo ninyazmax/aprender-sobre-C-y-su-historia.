@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Magia Detrás de C++ (echa por Sofi, con decoración de Steven)</title> 
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-size: 1.15em;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #181c24 0%, #232946 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before, body::after {
+            content: "";
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            top: -200px; left: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #00ffe7cc 0%, transparent 70%);
+            filter: blur(60px);
+            animation: move1 12s linear infinite alternate;
+        }
+        body::after {
+            bottom: -200px; right: -200px;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #3a86ff99 0%, transparent 70%);
+            filter: blur(60px);
+            animation: move2 14s linear infinite alternate;
+        }
+        @keyframes move1 {
+            0% { transform: translate(0,0);}
+            100% { transform: translate(80px, 120px);}
+        }
+        @keyframes move2 {
+            0% { transform: translate(0,0);}
+            100% { transform: translate(-100px, -80px);}
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210px;
+            height: 100%;
+            background: #232323;
+            border-right: 2px solid #3a86ff44;
+            padding-top: 40px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            box-shadow: 2px 0 16px #00ffe722;
+            transition: left 0.3s;
+            overflow-y: auto;
+        }
+        .sidebar a {
+            display: block;
+            color: #4fc3f7;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 6px 0 0 6px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 1.08em;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #333366;
+            color: #ffb700;
+            box-shadow: 2px 2px 12px #00ffe733;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 40px auto 0 auto;
+            background: rgba(30,34,44,0.98);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+            padding: 40px 60px 20px 60px;
+            margin-left: 230px;
+            position: relative;
+            z-index: 1;
+            transition: margin-left 0.3s;
+        }
+        @media (max-width: 1100px) {
+            .container { max-width: 98vw; padding: 20px 5vw; }
+        }
+        @media (max-width: 900px) {
+            .container { margin-left: 0; padding: 10px 2vw; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 5px 1vw; }
+        }
+        h1, h2, h3 {
+            color: #4fc3f7;
+            font-family: 'Montserrat', Arial, sans-serif;
+            letter-spacing: 1px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.6em;
+            margin-bottom: 0.2em;
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            font-size: 2em;
+            margin-top: 30px;
+            border-bottom: 2px solid #3a86ff;
+            padding-bottom: 10px;
+        }
+        p {
+            line-height: 1.6;
+            margin: 15px 0;
+            color: #e0e0e0;
+        }
+        .note {
+            background: linear-gradient(90deg, #232946 60%, #3a86ff22 100%);
+            padding: 18px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 5px solid #00ffe7;
+            color: #e0e0e0;
+            box-shadow: 0 2px 12px #00ffe722;
+        }
+        .fun-fact {
+            background: #1f2330;
+            border-left: 5px solid #ffb700;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .fun-fact h4 {
+            color: #ffb700;
+            margin-top: 0;
+        }
+        #sidebar-toggle {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+            background: linear-gradient(90deg, #00ffe7 0%, #3a86ff 100%);
+            color: #232323;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 12px #00ffe733;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align:center; margin-top:30px;">
+        <img src="https://lh3.google.com/u/0/d/1JIn6pQuC09VpbfVaMG17IHuYNBRYMpuM=w1366-h633-iv1?auditContext=prefetch" alt="Logo C++ Pixel" style="width:350px; image-rendering: pixelated; border:8px solid #3a86ff; border-radius:12px; background:#181c24; box-shadow:0 0 24px #00ffe7cc;">
+    </div>
+
+    <nav class="sidebar">
+        <a href="#historia">Historia</a>
+        <a href="#por-que-existe">¿Por qué existe?</a>
+        <a href="#donde-se-usa">¿Dónde se usa?</a>
+        <a href="#impacto">Impacto</a>
+        <a href="#futuro">Futuro</a>
+        <a href="#curiosidades">Curiosidades</a>
+        <a href="#regresa">Volver al código</a>
+    </nav>
+
+    <div class="container">
+        <h1>La Magia Detrás de C++</h1>
+        <div class="note">
+            <p><strong>Nota mia :</strong> Steven me obligó a escribir esto, pero como soy buena persona (y él puso los degradados bonitos), aquí tienen. 😘</p>
+
+            <!--sofi, no me obligue a nada, solo te dije que lo hicieras porque tu sabes mas de esto que yo xD.-->
+            <p>PD: Si encuentras errores, es culpa de Steven, no mía. 😜</p>
+            <!--joder, que no es culpa mia, si tu pusiste todo lo que esta aqui xD.-->
+        </div>
+
+        <section id="historia">
+            <h2>La Historia de C++</h2>
+            <p>C++ nació cuando Bjarne Stroustrup estaba aburrido en Bell Labs (como todos los programadores en los 70s) y dijo: "¿Qué tal si hacemos C más complicado??". Y así nació este hermoso desastre.</p>
+            
+            <div class="fun-fact">
+                <h4>Sabías que??</h4>
+                <p>El primer nombre fue "C con Clases", pero sonaba como un curso aburrido. Steven dice que si se hubiera llamado "C con estilo" habría conquistado el mundo, pero él también cree que los memes son arte.</p>
+         
+          <!--//ostia, que nombre tan aburrido, pero bueno, almenos no es tan aburrido como el de python xD.-->
+          <!--//Sofia Abigail Hernandez Iglesias...-->
+         <!-- //que, te arde que diga tu nombre "steven" en el codigo? xD.-->
+          <!--//nmms XD, es para que los chicos aprendan, no para que se rian de ti, aunque es gracioso.-->
+            </div>
+        </section>
+
+        <section id="por-que-existe">
+            <h2>¿Por qué existe C++?</h2>
+            <p>Porque los programadores necesitaban sufrir, pero con clase (literal). Combina:</p>
+            <ul>
+                <li>La velocidad de C</li>
+                <li>La elegancia de la POO</li>
+                <li>La paciencia de un santo para depurar templates</li>
+            </ul>
+            
+            <div class="note">
+                <p><strong>posdata:</strong> Steven insiste en que C++ es un lenguaje "top1", no le hagan caso, si ilusiono con un 
+                    "hello world" en python.</p>
+                    <!--sofi, no me ilusiono con un hello world en python xD (o bueno talves si jsjsjs), pero fue ase muchoooo :C, python es mejor (no dificil).--->
+                    <!--que hablas xD, de chiquito te botaron de la cuna o que? xD.-->
+            </div>
+        </section>
+
+        <section id="donde-se-usa">
+            <h2>¿Dónde se usa C++ hoy?</h2>
+            <p>En todos lados donde necesites velocidad...:</p>
+            
+            <div class="fun-fact">
+                <h4>Ejemplos reales:</h4>
+                <ul>
+                    <li><strong>Videojuegos:</strong> Porque 240 FPS no se logran con Python (lo siento, Steven).</li> <!--//yo que?? //esque tu no te quejas de nada poreso lo puse xD.-->
+                    <li><strong>Sistemas operativos:</strong> Donde un segfault significa reiniciar y llorar.</li>
+                    <li><strong>Finanzas:</strong> Porque perder microsegundos es perder millones (y el empleo).</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="impacto">
+            <h2>Impacto en la Programación</h2>
+            <p>C++ es el padre de lenguajes como Java, C# y hasta Rust (que básicamente es C++ con terapia).</p>
+            
+            <div class="note">
+                <p><strong>Nota de sofi:</strong>diganle a Steven que me deve una monster despues de esto,
+                    recuerdenselo >:D .</p>
+                   <!--//sofi, sigue soñando xD.-->
+                   <!-- //o me la compras o me la compras, no hay mas opciones :3.-->
+            </div>
+        </section>
+
+        <section id="futuro">
+            <h2>El Futuro de C++</h2>
+            <p>Seguirá existiendo porque:</p>
+            <ul>
+                <li>Los gamers quieren gráficos, no lenguajes "fáciles".</li>
+                <li>Los bancos necesitan velocidad, no código "legible".</li>
+                <li>Steven sigue creyendo que es el lenguaje definitivo (bendita inocencia).</li>
+                <!--//joder xD, no se queja de que no le puse nada de lo que me dijo, pero nimodo, ya esta hecho.-->
+            </ul>
+        </section>
+
+        <section id="curiosidades">
+            <h2>Curiosidades Innecesarias</h2>
+            
+            <div class="fun-fact">
+                <h4>1. El error más caro</h4>
+                <p>Un bug en un sistema de trading en C++ causó pérdidas de $400 millones. Steven dice que fue culpa del programador, no del lenguaje. Claro, como siempre.</p>
+            </div>
+
+            <div class="fun-fact">
+                <h4>2. El nombre más largo</h4>
+                <p>Un tipo en C++ puede tener nombres de +10,000 caracteres. Steven intentó uno y su IDE se suicidó.</p>
+                <!--//sofi, tremenda anecdota con lo de PHP xD.-->
+                <!--//joder, era para recordar viejos momentos xD.-->
+            </div>
+        </section>
+
+        <section id="regresa">
+            <h2>¿Aburrido de teoría?</h2>
+            <p>Vuelve al <a href="aprendiendoC++.html" style="color:#00ffe7;">tutorial con código de verdad</a>, donde Steven hace el trabajo pesado y yo solo pongo comentarios sarcásticos.</p>
+            
+            <div class="note">
+                <p><strong>Créditos:</strong> Esta página la escribió Sofi (la inteligente). Los colores bonitos los puso Steven (el que cree que CSS es programación).</p>
+                <p>PD: Si encuentras errores, es culpa de steven no mias.</p>
+                <p>PD2: Si te gustó, dale like, comparte y suscribete, esto no es YouTube, Steven, basta. 😜</p>
+            </div>
+        </section> 
+        
+                     <!--//sofi >:C recien me doy cuenta de esto.
+                    //pero no lo boy a cambiar, porque me da pereza, y porque es gracioso.
+                    //esto es para que los demas aprendan xD no a ver sarcasmos tuyos.
+                    //nimodo bb, tendra que quedarse asi.-->
+
+    </div>
+
+    <button id="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        let sidebarOpen = true;
+
+        toggleBtn.onclick = function() {
+            sidebarOpen = !sidebarOpen;
+            sidebar.style.left = sidebarOpen ? '0' : '-230px';
+            toggleBtn.innerHTML = sidebarOpen ? '&times;' : '&#9776;';
+        };
+
+        window.addEventListener('resize', () => {
+            if(window.innerWidth < 900) {
+                sidebarOpen = false;
+                sidebar.style.left = '-230px';
+                toggleBtn.innerHTML = '&#9776;';
+            }
+        });
+    </script>
+</body>
+</html>
